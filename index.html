@@ -558,7 +558,7 @@ function renderCart(){
       <div class="form-group"><label>Nombre completo</label><input id="f-nombre" type="text" placeholder="Tu nombre"></div>
       <div class="form-row">
         <div class="form-group"><label>Teléfono</label><input id="f-telefono" type="tel" placeholder="+56 9 xxxx xxxx"></div>
-        <div class="form-group"><label>Fecha de entrega</label><select id="f-fecha" onchange="onFechaChange(this.value)"><option value="">Cargando fechas...</option></select></div>
+        <div class="form-group"><label>Fecha de entrega</label><select id="f-fecha"><option value="">Selecciona fecha</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>Hora de entrega</label><select id="f-hora"><option value="">Elige fecha primero</option></select></div>
@@ -628,6 +628,7 @@ function initFecha(){
   const sel = document.getElementById('f-fecha');
   if(!sel) return;
   sel.innerHTML = '<option value="">Selecciona fecha</option>';
+  sel.addEventListener('change', function(){ onFechaChange(this.value); });
   const today = new Date();
   const DAYS_ES = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const MONTHS_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
