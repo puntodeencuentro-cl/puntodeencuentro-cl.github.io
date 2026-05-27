@@ -136,45 +136,25 @@
 </style>
 
 
-<script>
-// Contador de visitas con hits.sh
-async function registrarYVerVisitas(){
-  try {
-    const r = await fetch('https://hits.sh/puntodeencuentro-cl.github.io.json');
-    const d = await r.json();
-    return { hoy: d.today, total: d.total };
-  } catch(e){ return { hoy: '?', total: '?' }; }
-}
 
-if(window.location.hash === '#stats'){
-  window.addEventListener('load', async ()=>{
-    const stats = await registrarYVerVisitas();
-    const panel = document.createElement('div');
-    panel.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
-    panel.innerHTML = `
-      <div style="background:white;border-radius:16px;padding:2rem;text-align:center;max-width:320px;width:90%;">
-        <div style="font-size:2.5rem;margin-bottom:0.5rem;">📊</div>
-        <h2 style="color:#2D5016;margin:0 0 0.25rem;font-family:sans-serif;">Punto de Encuentro</h2>
-        <p style="color:#888;font-size:12px;margin:0 0 1.5rem;font-family:sans-serif;">Estadísticas del catálogo</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;">
-          <div style="background:#f0f5ea;border-radius:12px;padding:1rem;">
-            <div style="font-size:2rem;font-weight:700;color:#2D5016;">${stats.hoy}</div>
-            <div style="font-size:12px;color:#666;font-family:sans-serif;">visitas hoy</div>
-          </div>
-          <div style="background:#f0f5ea;border-radius:12px;padding:1rem;">
-            <div style="font-size:2rem;font-weight:700;color:#2D5016;">${stats.total}</div>
-            <div style="font-size:12px;color:#666;font-family:sans-serif;">visitas totales</div>
-          </div>
-        </div>
-        <button onclick="this.parentElement.parentElement.remove()" style="background:#2D5016;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;font-family:sans-serif;width:100%;">Cerrar</button>
-      </div>
-    `;
-    document.body.appendChild(panel);
-  });
-} else {
-  // Register visit silently on every load
-  fetch('https://hits.sh/puntodeencuentro-cl.github.io.json').catch(()=>{});
-}
+<script>
+// Registro de visitas en Google Sheets
+(async function(){
+  try {
+    await fetch('https://script.google.com/macros/s/AKfycby4_8yaU-j-7fpzRuUg9tdx-8PGNSCs7_dMRtN-rrVU9UZ8FgcC7TD-Fz7DP-XGUPTW/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        sheetId: '1og9Glz0hb9nuCjLBeZy6Jx6o3wcWJLqqzJosVwYTUKE',
+        tipo: 'visita',
+        fecha: new Date().toLocaleString('es-CL'),
+        pagina: window.location.href,
+        dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? 'Celular' : 'Computador'
+      })
+    });
+  } catch(e){}
+})();
 </script>
 </head>
 <body>
@@ -683,8 +663,8 @@ const SCHEDULE = {
 const BLOCKED_DAYS = [1, 2]; // Lunes y Martes
 
 const bookedSlots = {};
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNz36dbXJplWoB0zmB0RSwXQbQ-Lb06dlld8CE1Y_qxCH9HCni9ytp1gbuve248912iw/exec';
-const SHEET_ID = '19oPflhhikFfhgUEZ1wkZx24O34KP-8jqxoHNef97rnI';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4_8yaU-j-7fpzRuUg9tdx-8PGNSCs7_dMRtN-rrVU9UZ8FgcC7TD-Fz7DP-XGUPTW/exec';
+const SHEET_ID = '1og9Glz0hb9nuCjLBeZy6Jx6o3wcWJLqqzJosVwYTUKE';
 
 async function loadBookedSlots(){
   try{
