@@ -134,6 +134,52 @@
     .form-row{grid-template-columns:1fr;}
   }
 </style>
+
+<script>
+// Counter de visitas - invisible para clientes
+const NAMESPACE = 'puntodeencuentro-cl';
+const KEY = 'visitas-catalogo';
+
+async function registrarVisita(){
+  try {
+    await fetch('https://api.countapi.xyz/hit/' + NAMESPACE + '/' + KEY);
+  } catch(e){}
+}
+
+async function verEstadisticas(){
+  try {
+    const r = await fetch('https://api.countapi.xyz/get/' + NAMESPACE + '/' + KEY);
+    const d = await r.json();
+    return d.value || 0;
+  } catch(e){ return 0; }
+}
+
+// Registrar visita al cargar
+registrarVisita();
+
+// Panel secreto - se activa escribiendo "stats" en la URL
+// o yendo a #stats
+if(window.location.hash === '#stats'){
+  window.addEventListener('load', async ()=>{
+    const visitas = await verEstadisticas();
+    const panel = document.createElement('div');
+    panel.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    panel.innerHTML = `
+      <div style="background:white;border-radius:16px;padding:2rem;text-align:center;max-width:300px;width:90%;">
+        <div style="font-size:3rem;margin-bottom:0.5rem;">📊</div>
+        <h2 style="color:#2D5016;margin:0 0 0.5rem;font-family:sans-serif;">Punto de Encuentro</h2>
+        <p style="color:#888;font-size:13px;margin:0 0 1.5rem;font-family:sans-serif;">Estadísticas del catálogo</p>
+        <div style="background:#f0f5ea;border-radius:12px;padding:1.25rem;margin-bottom:1rem;">
+          <div style="font-size:3rem;font-weight:700;color:#2D5016;">${visitas}</div>
+          <div style="font-size:14px;color:#666;font-family:sans-serif;">visitas totales</div>
+        </div>
+        <button onclick="this.parentElement.parentElement.remove()" style="background:#2D5016;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;font-family:sans-serif;">Cerrar</button>
+      </div>
+    `;
+    document.body.appendChild(panel);
+  });
+}
+</script>
 </head>
 <body>
 
