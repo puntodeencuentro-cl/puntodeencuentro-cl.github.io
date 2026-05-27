@@ -552,37 +552,71 @@ function renderCart(){
   const total = cart.reduce((s,i)=>s+i.precio,0);
   totalEl.innerHTML = `<div class="total-row"><span>Total</span><span class="total-valor">${fmt(total)}</span></div><div class="divider"></div>`;
 
-  formEl.innerHTML = `
-    <div class="form-section">
-      <h3>Datos de entrega</h3>
-      <div class="form-group"><label>Nombre completo</label><input id="f-nombre" type="text" placeholder="Tu nombre"></div>
-      <div class="form-row">
-        <div class="form-group"><label>Teléfono</label><input id="f-telefono" type="tel" placeholder="+56 9 xxxx xxxx"></div>
-        <div class="form-group"><label>Fecha de entrega</label><select id="f-fecha"><option value="">Selecciona fecha</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Hora de entrega</label><select id="f-hora"><option value="">Elige fecha primero</option></select></div>
-        <div class="form-group"><label>Comuna</label><select id="f-comuna"><option value="">Selecciona...</option><option>Maipú</option><option>Padre Hurtado</option><option>Peñaflor</option><option>Malloco</option><option>Cerrillos</option><option>Talagante</option><option>Otra (consultar)</option></select></div>
-      </div>
-      <div class="form-group"><label>Dirección completa</label><input id="f-direccion" type="text" placeholder="Calle, número, depto..."></div>
-      <div class="form-group"><label>Notas u observaciones (opcional)</label><textarea id="f-notas" placeholder="Alergias, indicaciones especiales, etc."></textarea></div>
-      <div class="form-group">
-        <label>¿Cómo vas a pagar? 💳</label>
-        <select id="f-pago">
-          <option value="">Selecciona método de pago</option>
-          <option value="Transferencia">Transferencia bancaria</option>
-          <option value="Efectivo">Efectivo</option>
-          <option value="Tarjeta">Tarjeta (máquina)</option>
-        </select>
-      </div>
-    </div>
-    <div style="background:rgba(45,80,22,0.06);border:0.5px solid rgba(45,80,22,0.15);border-radius:10px;padding:0.75rem 1rem;margin:0.75rem 0;font-size:12.5px;color:var(--muted);line-height:1.7;">
-      🚗 <strong style="color:var(--texto)">Delivery sin costo</strong> en Padre Hurtado, Peñaflor, Talagante, Cerrillos y Maipú<br>
-      💳 <strong style="color:var(--texto)">Pagas al recibir</strong> tu pedido
-    </div>
-    <button class="send-btn" onclick="sendOrder()">Enviar pedido →</button>
-  `;
-  setTimeout(()=>{ initFecha(); }, 50);
+  formEl.innerHTML = '';
+
+  // Build form with DOM to ensure event listeners work
+  const fs = document.createElement('div');
+  fs.className = 'form-section';
+  fs.innerHTML = '<h3>Datos de entrega</h3>';
+
+  const g1 = document.createElement('div'); g1.className='form-group';
+  g1.innerHTML = '<label>Nombre completo</label><input id="f-nombre" type="text" placeholder="Tu nombre">';
+  fs.appendChild(g1);
+
+  const g2 = document.createElement('div'); g2.className='form-group';
+  g2.innerHTML = '<label>Teléfono</label><input id="f-telefono" type="tel" placeholder="+56 9 xxxx xxxx">';
+  fs.appendChild(g2);
+
+  const row1 = document.createElement('div'); row1.className='form-row';
+  
+  const gf = document.createElement('div'); gf.className='form-group';
+  gf.innerHTML = '<label>Fecha de entrega</label>';
+  const fSel = document.createElement('select'); fSel.id='f-fecha';
+  fSel.addEventListener('change', function(){ onFechaChange(this.value); });
+  gf.appendChild(fSel);
+
+  const gh = document.createElement('div'); gh.className='form-group';
+  gh.innerHTML = '<label>Hora de entrega</label>';
+  const hSel = document.createElement('select'); hSel.id='f-hora';
+  hSel.innerHTML = '<option value="">Elige fecha primero</option>';
+  gh.appendChild(hSel);
+
+  row1.appendChild(gf); row1.appendChild(gh);
+  fs.appendChild(row1);
+
+  const fMsg = document.createElement('div'); fMsg.id='fecha-msg';
+  fMsg.style.cssText='font-size:12px;color:#c0392b;margin-top:-8px;margin-bottom:8px;display:none;';
+  fs.appendChild(fMsg);
+
+  const g3 = document.createElement('div'); g3.className='form-group';
+  g3.innerHTML = '<label>Comuna</label><select id="f-comuna"><option value="">Selecciona...</option><option>Maipú</option><option>Padre Hurtado</option><option>Peñaflor</option><option>Malloco</option><option>Cerrillos</option><option>Talagante</option></select>';
+  fs.appendChild(g3);
+
+  const g4 = document.createElement('div'); g4.className='form-group';
+  g4.innerHTML = '<label>Dirección completa</label><input id="f-direccion" type="text" placeholder="Calle, número, depto...">';
+  fs.appendChild(g4);
+
+  const g5 = document.createElement('div'); g5.className='form-group';
+  g5.innerHTML = '<label>Notas u observaciones (opcional)</label><textarea id="f-notas" placeholder="Alergias, indicaciones especiales, etc."></textarea>';
+  fs.appendChild(g5);
+
+  const g6 = document.createElement('div'); g6.className='form-group';
+  g6.innerHTML = '<label>¿Cómo vas a pagar? 💳</label><select id="f-pago"><option value="">Selecciona método de pago</option><option value="Transferencia">Transferencia bancaria</option><option value="Efectivo">Efectivo</option><option value="Tarjeta">Tarjeta (máquina)</option></select>';
+  fs.appendChild(g6);
+
+  formEl.appendChild(fs);
+
+  const infoBox = document.createElement('div');
+  infoBox.style.cssText='background:rgba(45,80,22,0.06);border:0.5px solid rgba(45,80,22,0.15);border-radius:10px;padding:0.75rem 1rem;margin:0.75rem 0;font-size:12.5px;color:var(--muted);line-height:1.7;';
+  infoBox.innerHTML='🚗 <strong style="color:var(--texto)">Delivery sin costo</strong> en Padre Hurtado, Peñaflor, Talagante, Cerrillos y Maipú<br>💳 <strong style="color:var(--texto)">Pagas al recibir</strong> tu pedido';
+  formEl.appendChild(infoBox);
+
+  const sBtn = document.createElement('button');
+  sBtn.className='send-btn'; sBtn.textContent='Enviar pedido →';
+  sBtn.addEventListener('click', sendOrder);
+  formEl.appendChild(sBtn);
+
+  initFecha();
 }
 
 
