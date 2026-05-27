@@ -663,18 +663,25 @@ function initFecha(){
   if(!sel) return;
   sel.innerHTML = '<option value="">Selecciona fecha</option>';
   sel.addEventListener('change', function(){ onFechaChange(this.value); });
-  const today = new Date();
+  const now = new Date();
+  const currentHour = now.getHours();
   const DAYS_ES = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const MONTHS_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  for(let i=1; i<=60; i++){
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
+  // Si ya pasaron las 12:00 no se puede pedir para hoy, empezar desde mañana
+  const startDay = currentHour >= 12 ? 1 : 0;
+
+  for(let i=startDay; i<=60; i++){
+    const d = new Date(now);
+    d.setDate(now.getDate() + i);
     const dow = d.getDay();
+    const dateStr = formatDateStr(d);
     if(BLOCKED_DAYS.includes(dow) || !SCHEDULE[dow]) continue;
-    const val = formatDateStr(d);
-    const label = DAYS_ES[dow] + ' ' + d.getDate() + ' ' + MONTHS_ES[d.getMonth()];
+    // Domingo nunca se puede pedir el mismo día
+    if(i === 0 && dow === 0) continue;
+    const label = DAYS_ES[dow] + ' ' + d.getDate() + ' ' + MONTHS_ES[d.getMonth()]
+      + (i === 0 ? ' (hoy)' : i === 1 ? ' (mañana)' : '');
     const opt = document.createElement('option');
-    opt.value = val;
+    opt.value = dateStr;
     opt.textContent = label;
     sel.appendChild(opt);
   }
